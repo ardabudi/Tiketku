@@ -150,5 +150,22 @@ module.exports = {
       console.log(error);
       helper.customErrorResponse(res, 500, "Server error!");
     }
+  },
+
+  change: async (req, res) => {
+    try {
+      const salt = helper.generateSalt(18);
+      const newPassword = helper.setPassword(req.body.new_password, salt);
+      const data = {
+        password: newPassword.passwordHash,
+        salt: newPassword.salt
+      };
+      const hp = req.body.hp;
+      await userModel.changePassword(data, hp);
+      helper.response(res, 200, "Change password success");
+    } catch (error) {
+      console.log(error);
+      helper.customErrorResponse(res, 500, "Server error!");
+    }
   }
 };
