@@ -1,11 +1,19 @@
 const connection = require('../Configs/mysql')
 
 module.exports = {
-  getAll: (searchName, lowest, highest) => {
+  getAll: (searchName, lowest, highest, city) => {
     return new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM tb_hotel WHERE hotel_name LIKE '%${searchName}%' AND hotel_price BETWEEN ${lowest} AND ${highest}`, (error, result) => {
+      connection.query(`SELECT * FROM tb_hotel WHERE city LIKE '%${city}%' AND hotel_name LIKE '%${searchName}%' AND hotel_price BETWEEN ${lowest} AND ${highest}`, (error, result) => {
         if (error) reject(new Error(error))
         console.log('Get data from database')
+        resolve(result)
+      })
+    })
+  },
+  getImage:(id_hotel)=>{
+    return new Promise((resolve,reject)=>{
+      connection.query(`SELECT image as img from tb_hotel_images WHERE id_hotel = ${id_hotel}`, (error, result)=>{
+        if(error) reject(new Error(error))
         resolve(result)
       })
     })
@@ -24,7 +32,6 @@ module.exports = {
     return new Promise((resolve, reject) => {
       connection.query(`SELECT * FROM tb_hotel WHERE tb_hotel.id_hotel = ?`, hotelId, (error, result) => {
         if (error) reject(new Error(error))
-        console.log('Get data from database')
         resolve(result)
       })
     })

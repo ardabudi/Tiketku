@@ -1,16 +1,21 @@
 const hotelModel = require('../models/hotel')
 const miscHelper = require('../Helpers/index')
 const uniqid = require('uniqid')
-const { PORT, host } = require('../Configs/index')
+const { PORT, domain } = require('../Configs/index')
 // const redisCache = require('../helpers/redisCache')
 
 module.exports = {
   getAll: async (req, res) => {
     try {
-      const name = req.body.name || ''
-      const lowest = req.body.lowest || 0
-      const highest = req.body.highest || 10000000
-      const result = await hotelModel.getAll(name, lowest, highest)
+      const name = req.query.name || ''
+      const lowest = req.query.lowest || 0
+      const highest = req.query.highest || 10000000
+      const city = req.query.city || ''
+      const result = await hotelModel.getAll(name, lowest, highest, city)
+      for (var i=0; i< result.length; i++){
+        const images = await hotelModel.getImage(result[i].id_hotel)
+        result[i].images = images
+      }
       miscHelper.response(res, 200, result)
     } catch (error) {
       console.log(error)
@@ -42,14 +47,15 @@ module.exports = {
         console.log('Upload file success')
       })
       // console.log(request.file)
-      const imageAccess = `http://localhost:${PORT}/v1/images/${filename}`
+      const imageAccess = `http://${domain}:${PORT}/v1/images/${filename}`
       const data = {
         hotel_name: req.body.hotel_name,
         hotel_location: req.body.hotel_location,
         hotel_cover: imageAccess,
         hotel_description: req.body.hotel_description,
         hotel_price: req.body.hotel_price,
-        free_room: req.body.free_room
+        free_room: req.body.free_room,
+        city : req.body.city || ''
       }
       const result = await hotelModel.createHotels(data)
       data.id_hotel = result.insertId
@@ -64,9 +70,7 @@ module.exports = {
     try {
       const hotelId = req.params.hotelId
       const result = await hotelModel.detailHotel(hotelId)
-      // await redisCache.set(key, result)
-      miscHelper.response(res, 200, result)
-      // }
+      miscHelper.response(res, 200, result[0])
     } catch (error) {
       console.log(error)
       miscHelper.customErrorResponse(res, 404, 'Internal server error!')

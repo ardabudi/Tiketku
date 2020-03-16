@@ -1,7 +1,7 @@
 const models = require('../Models/hotel_image')
 const uniqid = require('uniqid')
 const helpers = require('../Helpers/index')
-const { PORT } = require('../Configs/index')
+const { PORT, domain } = require('../Configs/index')
 
 module.exports = {
   getAll: async (req, res) => {
@@ -37,7 +37,7 @@ module.exports = {
         console.log('Upload file success')
       })
       // console.log(request.file)
-      const imageAccess = `http://localhost:${PORT}/v1/images/${filename}`
+      const imageAccess = `http://${domain}:${PORT}/v1/images/${filename}`
       const data = {
         id_hotel: req.body.id_hotel,
         image: imageAccess
