@@ -43,7 +43,7 @@ module.exports = {
         image: imageAccess
       }
       const result = await models.createHI(data)
-      data.id_hotel = result.insertId
+      data.id_hi = result.insertId
       helpers.response(res, 200, data)
     } catch (error) {
       console.log(error)

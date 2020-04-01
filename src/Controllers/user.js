@@ -7,10 +7,11 @@ const Nexmo = require("nexmo");
 module.exports = {
   getUsers: async (req, res) => {
     try {
-      const result = await userModel.getUsers();
+      const hp = req.query.hp || ''
+      const result = await userModel.getUsers(hp);
       helper.response(res, 200, result);
     } catch (error) {
-      helpers.customErrorResponse(res, 500, "Failed");
+      helper.customErrorResponse(res, 500, "Failed");
     }
   },
   register: async (req, res) => {
@@ -42,7 +43,7 @@ module.exports = {
     };
 
     const hpValid = await userModel.checkHp(data.hp);
-    if (hpValid.length < 1) response.json({ error: "Wrong Email" });
+    if (hpValid.length < 1) return response.json({ message: "Wrong Email" });
     const dataUser = hpValid[0];
     const hashPassword = helper.setPassword(data.password, dataUser.salt);
 
@@ -115,17 +116,17 @@ module.exports = {
       await userModel.updateUser(data, hpValid[0].id_user);
 
       const nexmo = new Nexmo({
-        apiKey: "5c83713b",
-        apiSecret: "WmWhqsRbOTCZrHZ8"
+        apiKey: "dd360230",
+        apiSecret: "iVUUARQsgf9lxOB4"
       });
 
       const hpParsedArr = hp.split("");
       hpParsedArr[0] = "62";
       var realNumber = hpParsedArr.join("");
 
-      const from = "Hotelku";
+      const from = "Tiketku";
       const to = realNumber;
-      const text = `From: Hotelku \n Use OTP: ${data.OTP} \n Don't tell this code to anyone`;
+      const text = `From: Tiketku \n Use OTP: ${data.OTP} \n Don't tell this code to anyone`;
 
       await nexmo.message.sendSms(from, to, text);
 
